@@ -73,7 +73,7 @@ stages:
           - task: Docker@2
             inputs:
               containerRegistry: 'docker-registry'
-              repository: 'shmdus'
+              repository: 'shmdus/azureapp'
               command: 'buildAndPush'
               Dockerfile: '**/Dockerfile'
           
