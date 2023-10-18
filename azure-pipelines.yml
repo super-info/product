@@ -50,6 +50,7 @@ stages:
               projectName: 'spring-app'
               scanPath: '**/target/*.jar'
               format: 'JUNIT'
+              failOnCVSS: '8'
           - task: PublishTestResults@2
             inputs:
               testResultsFormat: 'JUnit'
