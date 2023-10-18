@@ -20,8 +20,8 @@ stages:
               mavenAuthenticateFeed: false
               effectivePomSkip: false
               sonarQubeRunAnalysis: false
-
           - script: |
+              ls -la
               ls -la target
 
       - job: Dependency_Check
