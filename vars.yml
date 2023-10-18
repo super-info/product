@@ -2,3 +2,4 @@
 variables:
     repo: 'shmdus/springapp'
     major: '1.0'
+    manifestrepo: 'https://shaikmhd95786@dev.azure.com/shaikmhd95786/Apps/_git/manifest'
