@@ -67,7 +67,7 @@ stages:
               buildType: 'current'
               downloadType: 'specific'
               artifactName: springapp
-              downloadPath: '$(System.ArtifactsDirectory)'
+              downloadPath: '$(Build.ArtifactStagingDirectory)'
               
           - script: ls -la
           - task: Docker@2
