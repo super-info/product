@@ -1,0 +1,59 @@
+trigger:
+- master
+
+pool:
+  name: agents
+
+stages:
+  - stage: Tools
+    jobs:
+      - job: Installer
+        displayName: Installing the tools
+        steps:
+          - script: |
+              apt-get update
+              apt-get install openjdk-8-jdk -y
+              apt install maven -y
+      - job: Build
+        displayName: Building Artifacts
+        dependsOn: Installer
+        steps:
+          - script: |
+              mvn clean package
+              ls -la
+  - stage: publish
+    jobs: 
+      - job: artifacts
+        displayName: publishing artifacts
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: '**/*jar'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'springapp'
+              publishLocation: 'Container'
+              
+  - stage: Test
+    jobs: 
+      - job: unit_test
+        displayName: Performing unit test
+        steps:
+          - script: | 
+              mvn test
+              ls -la
+  - stage: OWASP
+    jobs:
+      - job: Dependency_Check
+        displayName: Checking the dependency
+        steps:
+          - task: dependency-check-build-task@6
+            inputs:
+              projectName: 'Spring-boot-HW'
+              scanPath: '**/*jar'
+              format: 'JUNIT'
+
+
