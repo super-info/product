@@ -23,17 +23,35 @@ stages:
           - script: |
               ls -la
               ls -la target
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: '**/target/*.war'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'springapp'
+              publishLocation: 'Container'
 
       - job: Dependency_Check
         displayName: Checking the dependency
         dependsOn: Artifact_Build
         steps:
+          - checkout: none
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'springapp'
+              downloadPath: '$(System.ArtifactsDirectory)'
           - task: dependency-check-build-task@6
             inputs:
               projectName: 'spring-app'
               scanPath: '**/target/*.jar'
               format: 'JUNIT'
-          - script: ls -la target
+          - script: ls -la
+          
 
               
 
