@@ -1,0 +1,4 @@
+#Variables for springapp 
+variables:
+    repo: 'shmdus/springapp'
+    major: '1.0'
