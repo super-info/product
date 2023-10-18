@@ -21,40 +21,8 @@ stages:
           - script: |
               mvn clean package
               ls -la
-  - stage: publish
-    jobs: 
-      - job: artifacts
-        displayName: publishing artifacts
-        steps:
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)'
-              Contents: 'target/*jar'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'springapp'
-              publishLocation: 'Container'
-              
-  - stage: Test
-    jobs: 
-      - job: unit_test
-        displayName: Performing unit test
-        steps:
-          - script: | 
-              mvn test
-              ls -la
-  - stage: OWASP
-    jobs:
-      - job: Dependency_Check
-        displayName: Checking the dependency
-        steps:
-          - task: dependency-check-build-task@6
-            inputs:
-              projectName: 'Spring-boot-HW'
-              scanPath: '**/*jar'
-              format: 'JUNIT'
+              ls -la target
+
               
 
 
