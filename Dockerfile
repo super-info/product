@@ -1,4 +1,4 @@
 FROM openjdk:8
 EXPOSE 8080
-ADD target/springapp.jar .
+ADD springapp/target/springapp.jar .
 ENTRYPOINT ["java","-jar","/springapp.jar"]
