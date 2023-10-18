@@ -21,16 +21,17 @@ stages:
               effectivePomSkip: false
               sonarQubeRunAnalysis: false
               goals: 'package'
-          - script: |
-              apt-get update
-              apt-get install openjdk-8-jdk -y
-              apt install maven -y
+#          - script: |
+#              apt-get update
+#              apt-get install openjdk-8-jdk -y
+#              apt install maven -y
       - job: Build
         displayName: Building Artifacts
         dependsOn: Installer
         steps:
           - script: |
               mvn clean package
+              ls -la
   - stage: Test
     jobs: 
       - job: unit_test
@@ -47,7 +48,7 @@ stages:
           - task: dependency-check-build-task@6
             inputs:
               projectName: 'Spring-boot-HW'
-              scanPath: 'target/*jar'
+              scanPath: '**/target/*.jar'
               format: 'JUNIT'
 
               
