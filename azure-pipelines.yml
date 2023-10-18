@@ -5,82 +5,18 @@ pool:
   name: agents
 
 variables:
-  - name: major
-    value: 1.0
+  - template: "vars.yml"
+  - group: manifest-git
 
-stages:
-  - stage: Build_Test
-    jobs:
-      - job: Artifact_Build
-        displayName: Testing & Building artifacts
-        steps:
-          - task: Maven@4
-            inputs:
-              mavenPomFile: 'pom.xml'
-              publishJUnitResults: true
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              javaHomeOption: 'JDKVersion'
-              mavenVersionOption: 'Default'
-              mavenAuthenticateFeed: false
-              effectivePomSkip: false
-              sonarQubeRunAnalysis: false
-          - script: |
-              ls -la
-              ls -la target
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)'
-              Contents: '**/target/*.jar'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'springapp'
-              publishLocation: 'Container'
 
-      - job: Dependency_Check
-        displayName: Checking the dependency
-        dependsOn: Artifact_Build
-        steps:
-          - checkout: none
-          - task: DownloadBuildArtifacts@1
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'springapp'
-              downloadPath: '$(System.ArtifactsDirectory)'
-          - task: dependency-check-build-task@6
-            inputs:
-              projectName: 'spring-app'
-              scanPath: '**/target/*.jar'
-              format: 'JUNIT'
-
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: 'dependency-check/*junit.xml'
-              searchFolder: '$(Common.TestResultsDirectory)'
-              testRunTitle: 'Dependency Check'
-  - stage: Deployment
-    jobs:
-      - job: Docker_build
-        displayName: Building Docker image
-        steps:
-          - task: DownloadBuildArtifacts@1
-            inputs:
-              buildType: 'current'
-              downloadType: 'specific'
-              artifactName: springapp
-              downloadPath: '$(Build.SourcesDirectory)'
-              
-          - script: ls -la
-          - task: Docker@2
-            inputs:
-              containerRegistry: 'docker-registry'
-              repository: 'shmdus/azureapp'
-              command: 'buildAndPush'
-              Dockerfile: '**/Dockerfile'
-              tags: '$(major).$(Build.BuildId)'
+steps:
+  - script: |
+      git clone https://$(gituser):$(gittoken)@dev.azure.com/shaikmhd95786/Apps/_git/manifest
+      cd manifest
+      sed -i 's|$(dockeruser).*|$(repo):$(major).$(Build.BuildId)|g' deployment.yaml
+      git add .
+      git commit -m "image updated"
+      git push origin -o ci-skip
           
 
           
