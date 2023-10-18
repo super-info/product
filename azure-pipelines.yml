@@ -10,6 +10,17 @@ stages:
       - job: Installer
         displayName: Installing the tools
         steps:
+          - task: Maven@4
+            inputs:
+              mavenPomFile: 'pom.xml'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              javaHomeOption: 'JDKVersion'
+              mavenVersionOption: 'Default'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              sonarQubeRunAnalysis: false
+              goals: 'package'
           - script: |
               apt-get update
               apt-get install openjdk-8-jdk -y
@@ -20,8 +31,24 @@ stages:
         steps:
           - script: |
               mvn clean package
+  - stage: Test
+    jobs: 
+      - job: unit_test
+        displayName: Performing unit test
+        steps:
+          - script: | 
+              mvn test
               ls -la
-              ls -la target
+  - stage: OWASP
+    jobs:
+      - job: Dependency_Check
+        displayName: Checking the dependency
+        steps:
+          - task: dependency-check-build-task@6
+            inputs:
+              projectName: 'Spring-boot-HW'
+              scanPath: 'target/*jar'
+              format: 'JUNIT'
 
               
 
