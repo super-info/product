@@ -4,6 +4,10 @@ trigger:
 pool:
   name: agents
 
+variables:
+  - name: major
+    value: 1.0
+
 stages:
   - stage: Build_Test
     jobs:
@@ -76,6 +80,7 @@ stages:
               repository: 'shmdus/azureapp'
               command: 'buildAndPush'
               Dockerfile: '**/Dockerfile'
+              tags: '$(major).$(Build.BuildId)'
           
 
           
