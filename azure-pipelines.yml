@@ -50,13 +50,31 @@ stages:
               projectName: 'spring-app'
               scanPath: '**/target/*.jar'
               format: 'JUNIT'
-              failOnCVSS: '8'
+              failOnCVSS: '0'
           - task: PublishTestResults@2
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: 'dependency-check/*junit.xml'
               searchFolder: '$(Common.TestResultsDirectory)'
               testRunTitle: 'Dependency Check'
+  - stage: Deployment
+    jobs:
+      - job: Docker_build
+        displayName: Building Docker image
+        steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: 'current'
+              downloadType: 'specific'
+              downloadPath: '$(System.ArtifactsDirectory)'
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'Docker-registry'
+              repository: 'shmdus'
+              command: 'buildAndPush'
+              Dockerfile: '**/Dockerfile'
+          
+
           
 
               
