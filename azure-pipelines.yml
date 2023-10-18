@@ -50,7 +50,12 @@ stages:
               projectName: 'spring-app'
               scanPath: '**/target/*.jar'
               format: 'JUNIT'
-          - script: ls -la
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'dependency-check\*junit.xml'
+              searchFolder: '$(Common.TestResultsDirectory)'
+              testRunTitle: 'Dependency Check'
           
 
               
