@@ -34,7 +34,7 @@ stages:
           - task: dependency-check-build-task@6
             inputs:
               projectName: 'Spring-boot-HW'
-              scanPath: '**/*.jar'
+              scanPath: '**/target/*.jar'
               format: 'JUNIT'
 
               
