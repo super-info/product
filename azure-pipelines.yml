@@ -8,7 +8,7 @@ stages:
   - stage: Build_Test
     jobs:
       - job: Artifact_Build
-        displayName: Installing the tools
+        displayName: Testing & Building artifacts
         steps:
           - task: Maven@4
             inputs:
@@ -24,10 +24,9 @@ stages:
           - script: |
               ls -la target
 
-  - stage: Code_Analysis
-    jobs:
       - job: Dependency_Check
         displayName: Checking the dependency
+        dependsOn: Artifact_Build
         steps:
           - task: dependency-check-build-task@6
             inputs:
