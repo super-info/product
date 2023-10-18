@@ -55,5 +55,6 @@ stages:
               projectName: 'Spring-boot-HW'
               scanPath: '**/*jar'
               format: 'JUNIT'
+              
 
 
