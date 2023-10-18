@@ -5,7 +5,7 @@ pool:
   name: agents
 
 stages:
-  - stage: Build & Test
+  - stage: Build_Test
     jobs:
       - job: Artifact_Build
         displayName: Installing the tools
