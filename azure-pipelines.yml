@@ -21,10 +21,8 @@ stages:
               effectivePomSkip: false
               sonarQubeRunAnalysis: false
 
-#          - script: |
-#              apt-get update
-#              apt-get install openjdk-8-jdk -y
-#              apt install maven -y
+          - script: |
+              ls -la target
 
   - stage: Code_Analysis
     jobs:
@@ -33,9 +31,10 @@ stages:
         steps:
           - task: dependency-check-build-task@6
             inputs:
-              projectName: 'Spring-boot-HW'
+              projectName: 'spring-app'
               scanPath: '**/target/*.jar'
               format: 'JUNIT'
+          - script: ls -la target
 
               
 
