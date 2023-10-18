@@ -16,9 +16,10 @@ steps:
       git config --global user.name "$(gituser)"
       git config --global user.email "$(gitmail)"
       sed -i 's|$(dockeruser).*|$(repo):$(major).$(Build.BuildId)|g' deployment.yaml
+      cat deployment.yaml
       git add .
       git commit -m "image updated"
-      git push origin -o ci-skip
+      git push -uf origin
           
 
           
