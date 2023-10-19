@@ -1,5 +1,5 @@
 trigger:
-- main
+- master
 
 pool:
   name: agents
@@ -19,7 +19,7 @@ stages:
               scanlocation: '$(Build.SourcesDirectory)'
               configtype: 'predefined'
               predefinedconfigfile: 'GitleaksUdmCombo.toml'
-              scanmode: 'all'
+              scanmode: 'nogit'
               reportformat: 'sarif'
               verbose: true
       - job: Artifact_Build
