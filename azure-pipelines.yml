@@ -11,6 +11,15 @@ variables:
 stages:
   - stage: Build_Test
     jobs:
+      - job: gitleaks
+        displayName: Detecting the secrets
+        steps:
+          - task: Gitleaks@2
+            inputs:
+              scanlocation: '$(Build.SourcesDirectory)'
+              configtype: 'predefined'
+              predefinedconfigfile: 'GitleaksUdmCombo.toml'
+              reportformat: 'sarif'
       - job: Artifact_Build
         displayName: Testing & Building artifacts
         steps:
