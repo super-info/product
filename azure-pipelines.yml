@@ -18,7 +18,7 @@ stages:
             inputs:
               scanlocation: '$(Build.SourcesDirectory)'
               configtype: 'predefined'
-              predefinedconfigfile: 'GitleaksUdmCombo.toml'
+              predefinedconfigfile: 'UDMSecretChecksv8.toml'
               scanmode: 'nogit'
               redact: false
               reportformat: 'sarif'
