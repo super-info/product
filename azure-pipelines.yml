@@ -19,7 +19,9 @@ stages:
               scanlocation: '$(Build.SourcesDirectory)'
               configtype: 'predefined'
               predefinedconfigfile: 'GitleaksUdmCombo.toml'
+              scanmode: 'all'
               reportformat: 'sarif'
+              verbose: true
       - job: Artifact_Build
         displayName: Testing & Building artifacts
         steps:
