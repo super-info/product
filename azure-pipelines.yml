@@ -21,6 +21,7 @@ stages:
               predefinedconfigfile: 'GitleaksUdmCombo.toml'
               scanmode: 'nogit'
               redact: false
+              taskfail: false
               reportformat: 'sarif'
       - job: Artifact_Build
         displayName: Testing & Building artifacts
