@@ -11,7 +11,7 @@ variables:
 stages:
   - stage: Build_Test
     jobs:
-      - job: gitleaks
+      - job: gitleaks_SBOM
         displayName: Detecting the secrets
         steps:
           - task: Gitleaks@2
@@ -23,6 +23,18 @@ stages:
               redact: false
               taskfail: false
               reportformat: 'sarif'
+          - script: |
+              curl -Lo $(Agent.TempDirectory)/sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
+              chmod +x $(Agent.TempDirectory)/sbom-tool
+              $(Agent.TempDirectory)/sbom-tool generate -b $(Build.ArtifactStagingDirectory) -bc $(Build.SourcesDirectory) -pn Test -pv 1.0.0 -ps MyCompany -nsb https://sbom.mycompany.com -V Verbose
+              displayName: Generate SBOM
+          
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'sbom'
+              publishLocation: 'Container'
+
       - job: Artifact_Build
         displayName: Testing & Building artifacts
         dependsOn: gitleaks
@@ -40,6 +52,7 @@ stages:
           - script: |
               ls -la
               ls -la target
+              
           - task: CopyFiles@2
             inputs:
               SourceFolder: '$(Build.SourcesDirectory)'
