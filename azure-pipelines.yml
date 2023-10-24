@@ -52,8 +52,8 @@ stages:
               sonarQubeRunAnalysis: false
           - task: PublishCodeCoverageResults@2
             inputs:
-              summaryFileLocation: 'reports/jacoco/test/jacocoTestReport.xml file'
-              pathToSources: '$(System.DefaultWorkingDirectory)/src'
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
+              pathToSources: '$(System.DefaultWorkingDirectory)/src/main'
           - script: |
               ls -la
               ls -la target
