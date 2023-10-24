@@ -1,5 +1,5 @@
 trigger:
-- feature-1.0
+- feature-3.0
 
 pool:
   name: agents
