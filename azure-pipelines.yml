@@ -17,10 +17,11 @@ stages:
           - script: |
               apt-get install zip -y
               wget -O codescene-cicd.zip https://github.com/empear-analytics/codescene-ci-cd/archive/refs/tags/v1.3.3.zip
-              chmod +x codescene-cicd.zip
-              chmod +x codescene-cicd*/codescene-ci-cd.sh
               wget -P /opt/codescene-ci-cd/ https://github.com/empear-analytics/codescene-ci-cd/releases/download/v1.3.3/codescene-ci-cd.standalone.jar
-              sh ./codescene-ci-cd*/codescene-ci-cd.sh --codescene-delta-analysis-url $(CODESCENE_DELTA_ANALYSIS_URL) -u $(CODESCENE_USER) -p $(CODESCENE_PASSWORD) --analyze-branch-diff $(Build.SourceBranch) --azure-api-url $(AZURE_API_URL) --azure-api-token $(AZURE_API_TOKEN) --azure-project $(System.TeamProject) --azure-repo $(Build.Repository.Name) --fail-on-failed-goal
+              chmod +x codescene-cicd.zip
+              cd codescene-cicd*
+              chmod +x codescene-ci-cd.sh
+              codescene-ci-cd.sh --codescene-delta-analysis-url $(CODESCENE_DELTA_ANALYSIS_URL) -u $(CODESCENE_USER) -p $(CODESCENE_PASSWORD) --analyze-branch-diff $(Build.SourceBranch) --azure-api-url $(AZURE_API_URL) --azure-api-token $(AZURE_API_TOKEN) --azure-project $(System.TeamProject) --azure-repo $(Build.Repository.Name) --fail-on-failed-goal
               
 
       - job: gitleaks_SBOM
