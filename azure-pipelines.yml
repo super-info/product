@@ -62,6 +62,8 @@ stages:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)'
               ArtifactName: 'springapp'
               publishLocation: 'Container'
+          - script: mvn clean test
+          
 
       - job: Dependency_Check
         displayName: Checking the dependency
