@@ -17,7 +17,7 @@ stages:
           - script: |
               apt-get install zip -y
               wget -O codescene-ci-cd.zip https://github.com/empear-analytics/codescene-ci-cd/archive/refs/tags/v1.3.3.zip
-              unzip codescene-cicd.zip
+              unzip codescene-ci-cd.zip
               wget -P /opt/codescene-ci-cd/ https://github.com/empear-analytics/codescene-ci-cd/releases/download/v1.3.3/codescene-ci-cd.standalone.jar
               chmod +x codescene-ci-cd.zip
               chmod +x codescene-ci-cd*/codescene-ci-cd.sh
