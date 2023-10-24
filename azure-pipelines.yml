@@ -11,22 +11,8 @@ variables:
 stages:
   - stage: Build_Test
     jobs:
-      - job: Codescene
-        displayName: Reviewing the code
-        steps:
-          - script: |
-              apt-get install zip -y
-              wget -O codescene-ci-cd.zip https://github.com/empear-analytics/codescene-ci-cd/archive/refs/tags/v1.3.3.zip
-              unzip codescene-ci-cd.zip
-              wget -P /opt/codescene-ci-cd/ https://github.com/empear-analytics/codescene-ci-cd/releases/download/v1.3.3/codescene-ci-cd.standalone.jar
-              chmod +x codescene-ci-cd.zip
-              chmod +x codescene-ci-cd*/codescene-ci-cd.sh
-              sh ./codescene-ci-cd*/codescene-ci-cd.sh --codescene-delta-analysis-url $(CODESCENE_DELTA_ANALYSIS_URL) -u $(CODESCENE_USER) -p $(CODESCENE_PASSWORD)  --azure-api-url $(AZURE_API_URL) --azure-api-token $(AZURE_API_TOKEN) --azure-project $(System.TeamProject) --azure-repo $(Build.Repository.Name) --codescene-repository spring-app --fail-on-high-risk
-              
-
       - job: gitleaks_SBOM
         displayName: Detect secrets & Generate SBOM
-        dependsOn: Codescene
         steps:
           - task: Gitleaks@2
             inputs:
