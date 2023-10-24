@@ -43,11 +43,17 @@ stages:
               mavenPomFile: 'pom.xml'
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              codeCoverageToolOption: 'JaCoCo'
+              codeCoverageSourceDirectories: 'src/test'
               javaHomeOption: 'JDKVersion'
               mavenVersionOption: 'Default'
               mavenAuthenticateFeed: false
               effectivePomSkip: false
               sonarQubeRunAnalysis: false
+          - task: PublishCodeCoverageResults@2
+            inputs:
+              summaryFileLocation: 'reports/jacoco/test/jacocoTestReport.xml file'
+              pathToSources: '$(System.DefaultWorkingDirectory)/src'
           - script: |
               ls -la
               ls -la target
@@ -63,6 +69,7 @@ stages:
               ArtifactName: 'springapp'
               publishLocation: 'Container'
           - script: mvn clean test
+
           
 
       - job: Dependency_Check
