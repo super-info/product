@@ -35,7 +35,8 @@ stages:
               publishLocation: 'Container'
           
           - script: |
-              node -v
+              apt remove nodejs -y
+              apt remove npm -y
               npm install snyk@latest -g
               snyk auth $(snyk_api)
               snyk test --all-projects --sarif-file-output=CodeAnalysisLogs/snyk-open-source.sarif
