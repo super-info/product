@@ -35,10 +35,7 @@ stages:
               publishLocation: 'Container'
           
           - script: |
-              curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash 
-              source ~/.bashrc
-              nvm install 18.16.0 
-              nvm use 18.16.0
+              node -v
               npm install snyk@latest -g
               snyk auth $(snyk_api)
               snyk test --all-projects --sarif-file-output=CodeAnalysisLogs/snyk-open-source.sarif
