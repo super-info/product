@@ -42,13 +42,18 @@ stages:
             inputs:
               SonarCloud: 'sonarcloud'
               organization: 'shaikmhd95786'
-              scannerMode: 'Other'
+              scannerMode: 'CLI'
+              configMode: 'file'
               extraProperties: |
                 # Additional properties that will be passed to the scanner, 
                 # Put one key=value per line, example:
                 # sonar.exclusions=**/*.bin
                 sonar.projectKey=shaikmhd95786_spring-app
                 sonar.projectName=spring-app
+          - task: SonarCloudAnalyze@1
+            inputs:
+              jdkversion: 'JAVA_HOME'
+          
           - task: Maven@4
             inputs:
               mavenPomFile: 'pom.xml'
@@ -60,8 +65,7 @@ stages:
               mavenVersionOption: 'Default'
               mavenAuthenticateFeed: false
               effectivePomSkip: false
-              sonarQubeRunAnalysis: true
-              sqMavenPluginVersionChoice: 'latest'
+              sonarQubeRunAnalysis: false
           - task: PublishCodeCoverageResults@2
             inputs:
               summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
