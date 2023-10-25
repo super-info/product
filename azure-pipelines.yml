@@ -60,7 +60,9 @@ stages:
               mavenVersionOption: 'Default'
               mavenAuthenticateFeed: false
               effectivePomSkip: false
-              sonarQubeRunAnalysis: false
+              sonarQubeRunAnalysis: true
+              isJacocoCoverageReportXML: true
+              sqMavenPluginVersionChoice: 'latest'
           - task: PublishCodeCoverageResults@2
             inputs:
               summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
