@@ -37,19 +37,7 @@ stages:
       - job: Artifact_Build
         displayName: Testing & Building artifacts
         dependsOn: gitleaks_SBOM
-        steps:
-          - task: SonarCloudPrepare@1
-            inputs:
-              SonarCloud: 'sonarcloud'
-              organization: 'shaikmhd95786'
-              scannerMode: 'Other'
-              extraProperties: |
-                # Additional properties that will be passed to the scanner, 
-                # Put one key=value per line, example:
-                # sonar.exclusions=**/*.bin
-                sonar.projectKey=shaikmhd95786_spring-app
-                sonar.projectName=spring-app
-          
+        steps:  
           - task: Maven@4
             inputs:
               mavenPomFile: 'pom.xml'
@@ -70,7 +58,6 @@ stages:
           - script: |
               ls -la
               ls -la target
-          - task: SonarCloudAnalyze@1
               
           - task: CopyFiles@2
             inputs:
