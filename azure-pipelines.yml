@@ -37,7 +37,12 @@ stages:
           - script: |
               npm install snyk@latest -g
               snyk auth $(snyk_api)
-              snyk test --all-projects --sarif-file-output=CodeAnalysisLogs/snyk-open-source.sarif
+          - task: SnykSecurityScan@1
+            inputs:
+              serviceConnectionEndpoint: 'snyk-connect'
+              testType: 'app'
+              monitorWhen: 'always'
+              failOnIssues: true
               
           
 
