@@ -68,13 +68,29 @@ stages:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)'
               ArtifactName: 'springapp'
               publishLocation: 'Container'
-          - script: mvn clean test
+      - job: sonarcloud
+        displayName: Analysing the code
+        dependsOn: Artifact_Build
+        steps: 
+          - checkout: self
+            fetchDepth: 0
+          - task: SonarCloudPrepare@1
+            inputs:
+              SonarCloud: 'sonarcloud'
+              organization: 'shaikmhd95786'
+              scannerMode: 'Other'
+              extraProperties: |
+                # Additional properties that will be passed to the scanner, 
+                # Put one key=value per line, example:
+                # sonar.exclusions=**/*.bin
+                sonar.projectKey=shaikmhd95786_spring-app
+                sonar.projectName=spring-app
 
           
 
       - job: Dependency_Check
         displayName: Checking the dependency
-        dependsOn: Artifact_Build
+        dependsOn: sonarcloud
         steps:
           - checkout: none
           - task: DownloadBuildArtifacts@1
