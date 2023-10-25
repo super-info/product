@@ -35,8 +35,11 @@ stages:
               publishLocation: 'Container'
           
           - script: |
-              apt remove nodejs -y
-              apt remove npm -y
+              apt-get update
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              apt-get install nodejs -y
+              node -v
+              npm -v
               npm install snyk@latest -g
               snyk auth $(snyk_api)
               snyk test --all-projects --sarif-file-output=CodeAnalysisLogs/snyk-open-source.sarif
