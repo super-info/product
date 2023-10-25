@@ -39,14 +39,14 @@ stages:
               apt-get install npm -y
               npm install snyk@latest -g
               snyk auth $(snyk_api)
-              snyk code test --sarif-file-output=CodeAnalysisLogs/snyk-code.sarif
-          - task: PublishBuildArtifacts@1
+          - task: SnykSecurityScan@1
             inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)/CodeAnalysisLogs'
-              ArtifactName: 'CodeAnalysisLogs'
-              publishLocation: 'Container'
-          
-          
+              serviceConnectionEndpoint: 'snyk-connect'
+              testType: 'app'
+              targetFile: './'
+              monitorWhen: 'always'
+              failOnIssues: true
+              projectName: 'spring-app'
 
       - job: Artifact_Build
         displayName: Testing & Building artifacts
