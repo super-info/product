@@ -33,6 +33,23 @@ stages:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)'
               ArtifactName: 'sbom'
               publishLocation: 'Container'
+          
+          - script: |
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh
+              source ~/.bashrc
+              nvm install v14.10.1
+              nvm list
+              nvm use v14.10.1
+              npm install snyk@latest -g
+              snyk auth $(snyk_api)
+              snyk code test --sarif-file-output=CodeAnalysisLogs/snyk-code.sarif
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)/CodeAnalysisLogs'
+              ArtifactName: 'CodeAnalysisLogs'
+              publishLocation: 'Container'
+          
+          
 
       - job: Artifact_Build
         displayName: Testing & Building artifacts
