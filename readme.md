@@ -1,2 +1,2 @@
 Spring boot applications
-Integrated CICD
+Integrated CICD with argocd
