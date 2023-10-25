@@ -38,6 +38,17 @@ stages:
         displayName: Testing & Building artifacts
         dependsOn: gitleaks_SBOM
         steps:
+          - task: SonarCloudPrepare@1
+            inputs:
+              SonarCloud: 'sonarcloud'
+              organization: 'shaikmhd95786'
+              scannerMode: 'Other'
+              extraProperties: |
+                # Additional properties that will be passed to the scanner, 
+                # Put one key=value per line, example:
+                # sonar.exclusions=**/*.bin
+                sonar.projectKey=shaikmhd95786_spring-app
+                sonar.projectName=spring-app
           - task: Maven@4
             inputs:
               mavenPomFile: 'pom.xml'
@@ -68,33 +79,10 @@ stages:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)'
               ArtifactName: 'springapp'
               publishLocation: 'Container'
-      - job: sonarcloud
-        displayName: Analysing the code
-        dependsOn: Artifact_Build
-        steps: 
-          - checkout: self
-            fetchDepth: 0
-          - task: SonarCloudPrepare@1
-            inputs:
-              SonarCloud: 'sonarcloud'
-              organization: 'shaikmhd95786'
-              scannerMode: 'Other'
-              extraProperties: |
-                # Additional properties that will be passed to the scanner, 
-                # Put one key=value per line, example:
-                # sonar.exclusions=**/*.bin
-                sonar.projectKey=shaikmhd95786_spring-app
-                sonar.projectName=spring-app
-          
-          - task: SonarCloudAnalyze@1
-            inputs:
-              jdkversion: 'JAVA_HOME'
-
-          
 
       - job: Dependency_Check
         displayName: Checking the dependency
-        dependsOn: sonarcloud
+        dependsOn: Artifact_Build
         steps:
           - checkout: none
           - task: DownloadBuildArtifacts@1
