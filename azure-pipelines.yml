@@ -61,7 +61,6 @@ stages:
               mavenAuthenticateFeed: false
               effectivePomSkip: false
               sonarQubeRunAnalysis: true
-              isJacocoCoverageReportXML: true
               sqMavenPluginVersionChoice: 'latest'
           - task: PublishCodeCoverageResults@2
             inputs:
