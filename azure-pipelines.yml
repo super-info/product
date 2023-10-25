@@ -85,6 +85,10 @@ stages:
                 # sonar.exclusions=**/*.bin
                 sonar.projectKey=shaikmhd95786_spring-app
                 sonar.projectName=spring-app
+          
+          - task: SonarCloudAnalyze@1
+            inputs:
+              jdkversion: 'JAVA_HOME'
 
           
 
