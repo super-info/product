@@ -37,13 +37,12 @@ stages:
           - script: |
               apt-get install nodejs -y
               apt-get install npm -y
-              npm install snyk@latest -g
-              snyk auth $(snyk_api)
+#              npm install snyk@latest -g
+#              snyk auth $(snyk_api)
           - task: SnykSecurityScan@1
             inputs:
               serviceConnectionEndpoint: 'snyk-connect'
               testType: 'app'
-              targetFile: './'
               monitorWhen: 'always'
               failOnIssues: true
               projectName: 'spring-app'
