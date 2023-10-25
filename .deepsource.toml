@@ -1,6 +1,30 @@
 version = 1
 
 [[analyzers]]
+name = "javascript"
+
+  [analyzers.meta]
+  plugins = [
+    "angularjs",
+    "angular",
+    "react",
+    "vue",
+    "ember",
+    "meteor"
+  ]
+  environment = [
+    "jasmine",
+    "vitest",
+    "jest",
+    "mocha",
+    "cypress",
+    "mongo",
+    "browser",
+    "nodejs",
+    "jquery"
+  ]
+
+[[analyzers]]
 name = "test-coverage"
 
 [[analyzers]]
@@ -20,3 +44,9 @@ name = "docker"
 
   [analyzers.meta]
   dockerfile_paths = ["./"]
+
+[[transformers]]
+name = "standardjs"
+
+[[transformers]]
+name = "prettier"
