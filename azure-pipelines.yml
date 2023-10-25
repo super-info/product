@@ -43,16 +43,14 @@ stages:
               SonarCloud: 'sonarcloud'
               organization: 'shaikmhd95786'
               scannerMode: 'CLI'
-              configMode: 'file'
+              configMode: 'manual'
+              cliProjectKey: 'shaikmhd95786_spring-app'
+              cliProjectName: 'spring-app'
+              cliSources: '.'
               extraProperties: |
                 # Additional properties that will be passed to the scanner, 
                 # Put one key=value per line, example:
                 # sonar.exclusions=**/*.bin
-                sonar.projectKey=shaikmhd95786_spring-app
-                sonar.projectName=spring-app
-          - task: SonarCloudAnalyze@1
-            inputs:
-              jdkversion: 'JAVA_HOME'
           
           - task: Maven@4
             inputs:
@@ -73,6 +71,7 @@ stages:
           - script: |
               ls -la
               ls -la target
+          - task: SonarCloudAnalyze@1
               
           - task: CopyFiles@2
             inputs:
