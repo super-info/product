@@ -37,15 +37,13 @@ stages:
           - script: |
               apt-get install nodejs -y
               apt-get install npm -y
-#              npm install snyk@latest -g
-#              snyk auth $(snyk_api)
-          - task: SnykSecurityScan@1
-            inputs:
-              serviceConnectionEndpoint: 'snyk-connect'
-              testType: 'app'
-              monitorWhen: 'always'
-              failOnIssues: true
-              projectName: 'spring-app'
+              npm install snyk@latest -g
+              snyk auth $(snyk_api)
+              snyk test --all-projects --json-file-output=results.json
+              RESULT=$?
+              snyk-to-html -o $(Build.ArtifactStagingDirectory)/results-open-source.html < results.json
+              exit $RESULT
+          
 
       - job: Artifact_Build
         displayName: Testing & Building artifacts
