@@ -94,6 +94,41 @@ stages:
               searchFolder: '$(Common.TestResultsDirectory)'
               testRunTitle: 'Dependency Check'
 
+  - stage: Deployment
+    jobs:
+      - job: Docker_build
+        displayName: Building Docker image
+        steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: 'current'
+              downloadType: 'specific'
+              artifactName: springapp
+              downloadPath: '$(Build.SourcesDirectory)'
+              
+          - script: ls -la
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'docker-registry'
+              repository: 'shmdus/springapp'
+              command: 'buildAndPush'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(major).$(Build.BuildId)'
+      - job: Manifest_Update
+        displayName: updating the manifest file
+        dependsOn: Docker_build
+        steps:
+          - script: |
+              git clone https://$(gituser):$(gittoken)@dev.azure.com/shaikmhd95786/Apps/_git/manifest
+              cd manifest
+              git config --global user.name "$(gituser)"
+              git config --global user.email "$(gitmail)"
+              sed -i 's|$(dockeruser).*|$(repo):$(major).$(Build.BuildId)|g' deployment.yaml
+              cat deployment.yaml
+              git add .
+              git commit -m "image updated"
+              git push -uf origin
+
           
 
           
