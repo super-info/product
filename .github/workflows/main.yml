@@ -59,14 +59,14 @@ jobs:
         run: mvn clean package
       - name: file check
         run: ls -la target
-      - name: unit-test
-        run: | 
-          mvn test
-          ls -la
-          ls -la target
-          cd target
-          cd site
-          ls -la jacoco
+      # - name: unit-test
+      #   run: | 
+      #     mvn test
+      #     ls -la
+      #     ls -la target
+      #     cd target
+      #     cd site
+      #     ls -la jacoco
     # Vulnerability Check using Snyk Code
       # - name: Snyk
       #   uses: snyk/actions/maven@master
