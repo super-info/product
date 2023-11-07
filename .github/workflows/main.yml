@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-java@v3.13.0
         with:
           distribution: 'temurin'
-          java-version: '8'
+          java-version: '11'
       - name: package
         run: mvn clean package
       - name: file check
