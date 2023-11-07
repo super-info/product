@@ -1,7 +1,6 @@
 #Springboot-jdk-8
 name: product
-on: 
-  workflow_dispatch
+on: [workflow_dispatch, push]
 env:
   DB_USER: ${{ secrets.DB_USER }}
   DB_PASS: ${{ secrets.DB_PASS }}
@@ -14,7 +13,7 @@ jobs:
     permissions:
       checks: write
     outputs:
-      file1: ${{ steps.pub.outputs.test}}
+      branch_name: ${{ steps.branch_extract.outputs.branch}}
     steps:
     # Checking out the code
       - name: Checkout                            
@@ -27,6 +26,16 @@ jobs:
           echo ${{ github.repository }}
           echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
           echo ${{ env.APP_NAME }}
+      - name: extracting branch name
+        id: branch_extract
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            echo "branch=$(echo ${GITHUB_REF##*/})"
+          elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            echo "branch=$(echo $GITHUB_BASE_REF)"
+          else
+            echo "branch=INVALID_EVENT_BRANCH_UNKNOWN"
+          fi        
           
     #Scanning for secret detection
       - name: GitGuardian Shield Action
@@ -82,11 +91,13 @@ jobs:
       #       target/surefire-reports/TEST-*.xml
      #Analysing the Source Code using SonarCloud
       - name: Analyze with SonarCloud
+        env:
+          BRANCH_NAME: ${{build.steps.branch_extract.outputs.branch}}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
+          echo $BRANCH_NAME
           #chmod +x ./mvnw
           mvn -B verify sonar:sonar -Dsonar.projectKey=super-info -Dsonar.organization=super-info -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/target/site/jacoco/jacoco.xml -Dsonar.qualitygate.wait=true
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         continue-on-error: true
 
     # Docker Build
