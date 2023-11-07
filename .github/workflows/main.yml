@@ -1,6 +1,6 @@
 #Springboot-jdk-8
 name: product
-on: [workflow_dispatch, push]
+on: workflow_dispatch
 env:
   DB_USER: ${{ secrets.DB_USER }}
   DB_PASS: ${{ secrets.DB_PASS }}
@@ -19,13 +19,13 @@ jobs:
       - name: Checkout                            
         uses: actions/checkout@v4.1.1
       - name: echo
+        id: app
         run: |
           ls -la
           echo "passed"
           echo $APP_NAME
           echo ${{ github.repository }}
-          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
-          echo ${{ env.APP_NAME }}      
+          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV     
           
     #Scanning for secret detection
       - name: GitGuardian Shield Action
@@ -102,6 +102,7 @@ jobs:
    
     # Docker Push
       - name: Push Docker GCR
+        
         uses: RaccoonDev/push-docker-gcr@v1
         env:
           GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
