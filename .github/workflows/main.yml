@@ -92,7 +92,7 @@ jobs:
      #Analysing the Source Code using SonarCloud
       - name: Analyze with SonarCloud
         env:
-          BRANCH_NAME: ${{build.steps.branch_extract.outputs.branch}}
+          BRANCH_NAME: ${{ steps.branch_extract.outputs.branch }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           echo $BRANCH_NAME
