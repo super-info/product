@@ -8,5 +8,6 @@ env:
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PORT: ${{ secrets.DB_PORT }}
 jobs:
-  build:
+  CICD:   
     uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
+    
