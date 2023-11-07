@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       checks: write
+      security-events: write
+      pull-requests: write
     steps:
     # Checking out the code
       - name: Checkout                            
