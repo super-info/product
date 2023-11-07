@@ -55,20 +55,7 @@ jobs:
       #     cd target
       #     cd site
       #     ls -la jacoco
-    # Vulnerability Check using Snyk Code
-      # - name: Snyk
-      #   uses: snyk/actions/maven@master
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      #   with:
-      #     command: test
-      #     args: |
-      #       --severity-threshold=high
-      #       --sarif-file-output=snyk.sarif
-      # - name: Upload result to GitHub Code Scanning
-      #   uses: github/codeql-action/upload-sarif@v2
-      #   with:
-      #     sarif_file: snyk.sarif
+
           
       # Publishing the test results to the Job Summary
       # - name: Publish Test Results
@@ -94,51 +81,36 @@ jobs:
       - name: Docker Build
         run: |
           docker build -t ${{ env.APP_NAME }}:1.0.${{ github.run_number }} .
-          #docker tag ${{ env.APP_NAME }}:1.0.${{ github.run_number }} ${{ vars.GOOGLE_PROJECT_ID }}/${{ env.APP_NAME }}:1.0.${{ github.run_number }}
-          # docker login -u shmdus -p cannonbolt0204
-          # docker push shmdus/crud-app:1.0.${{ github.run_number }}
     
     #Trivy Scanning 
       - name: Trivy scanning
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
           trivy image --format sarif -o report.sarif docker.io/${{ env.APP_NAME }}:1.0.${{ github.run_number }}
+          ls -la
           # trivy image gcr.io/${{ vars.GOOGLE_PROJECT_ID }}/${{ env.APP_NAME }}:1.0.${{ github.run_number }}
         shell: bash
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v2
         with:
           # Path to SARIF file relative to the root of the repository
-          sarif_file: reports.sarif
+          sarif_file: report.sarif
           # Optional category for the results
           # Used to differentiate multiple results for one commit
           category: Trivy-analysis    
              
-    #  Pushing Image to PRIVATE ARFTIFACT REGISTRY
-    #   - name: Google Artifact Registry Build & Push
-    #     uses: piotr-krusinski/action-google-artifact-registry@v1.0
-    #     with:
-    #       google_project_id: ${{vars.GOOGLE_PROJECT_ID}}
-    #       google_artifact_registry_region: us-central
-    #       google_artifact_registry_hostname: gcr.io
-    #       google_artifact_registry_name: github-ci
-    #       service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
-    #       dockerfile: ./
-    #       image_name: $APP_NAME
-    #       tag_list: 1.0.${{ github.run_number }}
    
     # Docker Push
-    
       - name: Push Docker GCR
         uses: RaccoonDev/push-docker-gcr@v1
         env:
           GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
           GOOGLE_PROJECT_ID: ${{ vars.GOOGLE_PROJECT_ID }}
         with:
-        # Google Container Registry Host
           image_name: ${{ env.APP_NAME }}
           image_tag: 1.0.${{ github.run_number }}
-    #Update Manifest File
+          
+    # Update Manifest File
       - name: Checkout
         uses: actions/checkout@v4.1.1
         with:
@@ -149,10 +121,8 @@ jobs:
           PAT: ${{ secrets.GIT_TOKEN }}
         run: |
           ls -la
-          #git clone https://${{ secrets.GIT_TOKEN }}@github.com/super-info/k8s-manifest.git
           git config --global user.email "${{ secrets.GIT_MAIL }}"
           git config --global user.name "$GITHUB_REPOSITORY_OWNER"
-          #git remote add origin https://$PAT@github.com/super-info/k8s-manifest.git
           cd ${{ env.APP_NAME }}
           sed -i "s|gcr.io/${{ vars.GOOGLE_PROJECT_ID }}.*| gcr.io/${{ vars.GOOGLE_PROJECT_ID }}/${{ env.APP_NAME }}:1.0.${{ github.run_number }}|g" deployment.yaml
           cat deployment.yaml
