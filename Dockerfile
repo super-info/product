@@ -1,4 +1,4 @@
 FROM openjdk:8
 EXPOSE 8080
-ADD springapp/target/springapp.jar .
-ENTRYPOINT ["java","-jar","/springapp.jar"]
+COPY target/product-1.0.0.jar .
+ENTRYPOINT ["java","-jar","product-1.0.0.jar"]
