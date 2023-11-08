@@ -11,8 +11,19 @@ permissions:
    checks: write
    security-events: write
    pull-requests: write 
-jobs:    
-  CICD:   
+
+jobs:
+  settings:
+    runs-on: ubuntu-latest
+    outputs:
+      appenv: ${{ steps.app.outputs.app-name }}
+    steps:
+       - name: setting env
+         id: app
+         run: echo "app-name=$(basename ${{ github.repository }})"
+       
+  CICD:
+    needs: settings
     uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
     with:
       google_project_id: ${{ vars.GOOGLE_PROJECT_ID }}
