@@ -16,9 +16,6 @@ jobs:
     uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
     with:
       google_project_id: ${{ vars.GOOGLE_PROJECT_ID }}
-      permission_check: write
-      permission_security-events: write
-      permission_pull-requests: write
       #tag: ${{ github.run_number }}
       
       
