@@ -24,8 +24,6 @@ jobs:
        
   CICD:
     needs: settings
-    env:
-      APP_NAME: ${{needs.outputs.appenv}}
     uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
     with:
       google_project_id: ${{ vars.GOOGLE_PROJECT_ID }}
