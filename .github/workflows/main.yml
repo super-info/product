@@ -7,7 +7,20 @@ env:
   DB_HOST: ${{ secrets.DB_HOST }}
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PORT: ${{ secrets.DB_PORT }}
-jobs:
+jobs:    
   CICD:   
     uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
-    
+    with:
+      google_project_id: ${{ vars.GOOGLE_PROJECT_ID }}
+      permission_check: write
+      permission_security-events: write
+      permission_pull-requests: write
+      #tag: ${{ github.run_number }}
+      
+      
+    secrets:
+      gitguradian_api_key: ${{ secrets.GITGUARDIAN_API_KEY }}
+      sonar_token: ${{ secrets.SONAR_TOKEN }}
+      git_token: ${{ GIT_TOKEN }}
+      git_mail: ${{ secrets.GIT_MAIL }}
+      google_service_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
