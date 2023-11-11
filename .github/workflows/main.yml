@@ -43,6 +43,12 @@ jobs:
             echo "Ths is my $APP_NAME"
             echo "Ths is $(env.APP_NAME)"
             echo "testing $super"
+   test:
+     runs-on: ubuntu-latest
+     steps:
+       - name: testing
+         run: |
+          echo "Ths is my $APP_NAME"
             
             
             
