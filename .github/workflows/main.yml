@@ -16,16 +16,16 @@ jobs:
    secret:
      runs-on: ubuntu-latest
      outputs:
-       appfile: ${{steps.app.outputs.app}}
+       appfile: ${{steps.app.outputs.appenv}}
      steps:
        - name: checkout
          uses: actions/checkout@v4.1.1
        - name: env
          id: app
-         run: echo "app=$(basename ${{github.repository}})" >> $GITHUB_OUTPUT
+         run: echo "appenv=$(basename ${{github.repository}})" >> $GITHUB_OUTPUT
        - name: test
          env:
-           appname: ${{steps.app.outputs.name}}
+           appname: ${{ steps.app.outputs.appenv }}
          run: |
            echo $appname
          
