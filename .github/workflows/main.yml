@@ -37,12 +37,14 @@ jobs:
           env:
             APP_NAME: ${{ needs.secret.outputs.appfile }}
             super: $(basename ${{github.respoitory}})
-          run:
-            echo $APP_NAME
-            echo $(env.APP_NAME)
-            echo $(APP_NAME)
-            echo $appname
-            echo $super
+          run: |
+            echo "NAME_APP=${{ needs.secret.outputs.appfile }}" >> $GITHUB_ENV
+            echo "$NAME_APP"
+            echo "Ths is $APP_NAME"
+            echo "Ths is$(env.APP_NAME)"
+            echo "$(APP_NAME)"
+            echo "$appname"
+            echo "$super"
             
             
             
