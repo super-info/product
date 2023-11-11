@@ -44,6 +44,7 @@ jobs:
             echo "Ths is $(env.APP_NAME)"
             echo "testing $super"
    test:
+     needs: sbom
      runs-on: ubuntu-latest
      steps:
        - name: testing
