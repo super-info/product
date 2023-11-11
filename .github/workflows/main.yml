@@ -13,13 +13,13 @@ permissions:
    pull-requests: write 
 
 jobs:      
-  CICD:
-    uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
-    with:
-      google_project_id: ${{ vars.GOOGLE_PROJECT_ID }}
-      #tag: ${{ github.run_number }}
-      app_name: ${{needs.outputs.appenv}}
-    secrets: inherit     
+  # CICD:
+  #   uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
+  #   with:
+  #     google_project_id: ${{ vars.GOOGLE_PROJECT_ID }}
+  #     #tag: ${{ github.run_number }}
+  #     app_name: ${{needs.outputs.appenv}}
+  #   secrets: inherit     
       
     # secrets:
     #   gitguradian_api_key: ${{ secrets.GITGUARDIAN_API_KEY }}
@@ -27,3 +27,152 @@ jobs:
     #   git_token: ${{ secrets.GIT_TOKEN }}
     #   git_mail: ${{ secrets.GIT_MAIL }}
     #   google_service_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
+  Secret-Detect:
+    runs-on: ubuntu-latest
+    steps:
+    # Checking out the code
+      - name: Checkout                            
+        uses: actions/checkout@v4.1.1
+      # - name: setting-env
+      #   run: echo "APP_NAME= ${{needs.outputs.appenv}}" >> $GITHUB_ENV
+      - name: echo
+        id: app
+        run: |
+          ls -la
+          echo "passed"
+          echo $APP_NAME
+          echo ${{ github.repository }}
+          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV 
+          echo ${{env.APP_NAME}}
+          echo ${{ github.run_number }}
+          echo ${{inputs.tag}}
+          echo $APP_NAME
+          echo ${{ inputs.app_name }}
+          
+    #Scanning for secret detection
+      - name: GitGuardian Shield Action
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+        run: |
+          pipx install ggshield
+          ggshield secret scan ci
+        continue-on-error: true
+  
+     # Generate SBOM
+      - name: Generate SBOM
+        run: |
+          curl -Lo sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
+          ls -la
+          chmod +x sbom-tool
+          ./sbom-tool generate -b ${{ github.workspace }} -bc ${{ github.workspace }} -pn ${{github.repository}} -pv 1.0.0 -ps ${{github.repository_owner}} -nsb https://sbom.mycompany.com -V
+          ls -la
+      - name: Upload Sbom 
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: SBOM-Report
+          path: ${{ github.workspace }}/_manifest
+          
+    # Setting up Java Environment
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.13.0
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: package
+        run: mvn clean package
+      - name: file check
+        run: ls -la target
+      # - name: unit-test
+      #   run: | 
+      #     mvn test
+      #     ls -la
+      #     ls -la target
+      #     cd target
+      #     cd site
+      #     ls -la jacoco
+
+          
+      #Publishing the test results to the Job Summary
+      # - name: Publish Test Results
+      #   uses: EnricoMi/publish-unit-test-result-action@v2.11.0
+      #   with:
+      #     comment_mode: off
+      #     files: | 
+      #       target/surefire-reports/TEST-*.xml
+     # Analysing the Source Code using SonarCloud
+      - name: Setting Git branch name
+        uses: petehouston/github-actions-query-branch-name@v1.2
+      - name: Analyze with SonarCloud
+        env:
+          BRANCH_NAME: ${{ steps.branch_extract.outputs.branch }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo $GIT_BRANCH_NAME
+          #chmod +x ./mvnw
+          mvn -B verify sonar:sonar -Dsonar.projectKey=super-info -Dsonar.organization=super-info -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/target/site/jacoco/jacoco.xml -Dsonar.qualitygate.wait=true
+        continue-on-error: true
+
+    # Docker Build
+      - name: Docker Build
+        run: |
+          docker build -t ${{ env.APP_NAME }}:1.0.${{ github.run_number }} .
+    
+    #Trivy Scanning 
+      - name: Trivy scanning
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy image --format sarif -o report.sarif docker.io/${{ env.APP_NAME }}:1.0.${{ github.run_number }}
+          ls -la
+        shell: bash
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: report.sarif
+          # Optional category for the results
+          # Used to differentiate multiple results for one commit
+          category: Trivy-analysis    
+             
+   
+    # Docker Push
+      - name: Push Docker GCR
+        
+        uses: RaccoonDev/push-docker-gcr@v1
+        env:
+          GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
+          GOOGLE_PROJECT_ID: ${{ inputs.google_project_id }}
+        with:
+          image_name: ${{ env.APP_NAME }}
+          image_tag: 1.0.${{ github.run_number }}
+          
+    # Update Manifest File
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+        with:
+          repository: 'super-info/k8s-manifest'
+          token: ${{ secrets.GIT_TOKEN }}
+      - name: Update image
+        # env:
+        #   PAT: ${{ secrets.git_token }}
+        run: |
+          ls -la
+          git config --global user.email "${{ secrets.GIT_MAIL }}"
+          git config --global user.name "$GITHUB_REPOSITORY_OWNER"
+          cd ${{ env.APP_NAME }}
+          sed -i "s|gcr.io/${{ inputs.google_project_id }}.*| gcr.io/${{ inputs.google_project_id }}/${{ env.APP_NAME }}:1.0.${{ github.run_number }}|g" deployment.yaml
+          cat deployment.yaml
+          git add .
+          git commit -m "image update"
+          git push -uf origin
+          
+
+          
+    # #  - name: JaCoCo Report
+    # #    uses: Madrapps/jacoco-report@v1.6.1
+    # #    with:
+    # #      paths: target/site/jacoco/jacoco.xml
+    # #      token: ${{secrets.TOKEN_REPO}}
+    # #      min-coverage-overall: 60
+      
+
+    
