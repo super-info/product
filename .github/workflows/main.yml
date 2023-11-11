@@ -22,7 +22,7 @@ jobs:
          uses: actions/checkout@v4.1.1
        - name: env
          id: app
-         run: echo "app=$(basename ${{github.repository}})
+         run: echo "app=$(basename ${{github.repository}})"
        - name: test
          env:
            appname: ${{steps.app.outputs.name}}
