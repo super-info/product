@@ -35,7 +35,7 @@ jobs:
       steps:
         - name: run
           env:
-            APP_NAME: ${{ needs.outputs.appfile }}
+            APP_NAME: ${{ secret.outputs.appfile }}
             super: $(basename ${{github.respoitory}})
           run:
             echo $APP_NAME
