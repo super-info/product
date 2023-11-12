@@ -179,7 +179,7 @@ jobs:
         uses: actions/cache@v3.3.2
         with:
           path: ./$APP_NAME.tar
-          key: ${{github.repository}}-${{ hashFiles ('./*tar')}}
+          key: ${{github.repository}}-${{ hashFiles('./*.tar')}}
           fail-on-cache-miss: true
       - name: Trivy scanning
         run: |
@@ -207,9 +207,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: setting-app-env
-        env:  
-          APP_NAME: $(basename ${{ github.repository }})
         run: |
+          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
           echo $APP_NAME
       # - name: Downloading the docker build image
       #   uses: actions/download-artifact@v2.1.1
@@ -221,10 +220,12 @@ jobs:
         uses: actions/cache@v3.3.2
         with:
           path: ./$APP_NAME.tar
-          key: ${{github.repository}}-${{ hashFiles ('./*tar')}}
+          key: ${{github.repository}}-${{ hashFiles('./*.tar')}}
           fail-on-cache-miss: true
       - name: extracting docker artifact
-        run: docker load -i ./$APP_NAME.tar
+        run: |
+          docker load -i ./$APP_NAME.tar
+          docker images
         
       - name: Push Docker GCR
         uses: RaccoonDev/push-docker-gcr@v1
