@@ -28,10 +28,6 @@ jobs:
            appname: ${{ steps.app.outputs.appenv }}
          run: |
            echo $appname
-           echo "this it it" > product.war
-           echo "this is it" > product.jar
-           ls -la
-           find ./ \.(war|jar)$
          
    sbom:
       needs: secret
