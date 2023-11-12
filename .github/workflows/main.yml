@@ -91,6 +91,9 @@ jobs:
         env:
           APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
           test_app: $(basename ${{ github.repository }})
+        run: |
+          echo $APP_NAME
+          echo $test_app
       # - name: package
       #   run: mvn clean package
       - name: file check
