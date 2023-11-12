@@ -14,13 +14,13 @@ permissions:
    pull-requests: write 
 
 jobs:      
-  # CICD:
-  #   uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
-  #   with:
-  #     google_project_id: ${{ vars.GOOGLE_PROJECT_ID }}
-  #     #tag: ${{ github.run_number }}
-  #     app_name: ${{needs.outputs.appenv}}
-  #   secrets: inherit     
+  CICD:
+    uses: super-info/cicd-reusable/.github/workflows/springboot-jdk-11.yaml@main
+    # with:
+    #   google_project_id: ${{ vars.GOOGLE_PROJECT_ID }}
+    #   #tag: ${{ github.run_number }}
+    #   app_name: ${{needs.outputs.appenv}}
+    secrets: inherit     
       
     # secrets:
     #   gitguradian_api_key: ${{ secrets.GITGUARDIAN_API_KEY }}
@@ -29,252 +29,252 @@ jobs:
     #   git_mail: ${{ secrets.GIT_MAIL }}
     #   google_service_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
   #Scanning for secret detection
-  secret-detect:
-    runs-on: ubuntu-latest
-    outputs:
-      appfile: ${{ steps.appenv.outputs.app-name}}
-    steps:
-    # Checking out the code
-      - name: Checkout                            
-        uses: actions/checkout@v4.1.1
-      - name: setting-app-env
-        id: appenv
-        run: echo "app-name= $(basename ${{github.repository}})" >> $GITHUB_OUTPUT
+#   secret-detect:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       appfile: ${{ steps.appenv.outputs.app-name}}
+#     steps:
+#     # Checking out the code
+#       - name: Checkout                            
+#         uses: actions/checkout@v4.1.1
+#       - name: setting-app-env
+#         id: appenv
+#         run: echo "app-name= $(basename ${{github.repository}})" >> $GITHUB_OUTPUT
           
-      - name: GitGuardian Shield Action
-        env:
-          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
-        run: |
-          pipx install ggshield
-          ggshield secret scan ci
-        continue-on-error: true
+#       - name: GitGuardian Shield Action
+#         env:
+#           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+#         run: |
+#           pipx install ggshield
+#           ggshield secret scan ci
+#         continue-on-error: true
   
 
-# Generate SBOM
-  SBOM:
-    needs: secret-detect
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout                            
-        uses: actions/checkout@v4.1.1
-      - name: setting-app-env
-        env: 
-          APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
-        run: |
-          echo $APP_NAME
-      - name: Generate SBOM
-        run: |
-          echo $APP_NAME
-          curl -Lo sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
-          ls -la
-          chmod +x sbom-tool
-          ./sbom-tool generate -b ${{ github.workspace }} -bc ${{ github.workspace }} -pn ${{github.repository}} -pv 1.0.0 -ps ${{github.repository_owner}} -nsb https://sbom.mycompany.com -V
-          ls -la
+# # Generate SBOM
+#   SBOM:
+#     needs: secret-detect
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout                            
+#         uses: actions/checkout@v4.1.1
+#       - name: setting-app-env
+#         env: 
+#           APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
+#         run: |
+#           echo $APP_NAME
+#       - name: Generate SBOM
+#         run: |
+#           echo $APP_NAME
+#           curl -Lo sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
+#           ls -la
+#           chmod +x sbom-tool
+#           ./sbom-tool generate -b ${{ github.workspace }} -bc ${{ github.workspace }} -pn ${{github.repository}} -pv 1.0.0 -ps ${{github.repository_owner}} -nsb https://sbom.mycompany.com -V
+#           ls -la
 
-      - name: Upload Sbom 
-        uses: actions/upload-artifact@v3.1.3
-        with:
-          name: SBOM-Report
-          path: ${{ github.workspace }}/_manifest
+#       - name: Upload Sbom 
+#         uses: actions/upload-artifact@v3.1.3
+#         with:
+#           name: SBOM-Report
+#           path: ${{ github.workspace }}/_manifest
           
-  #Building Maven Artifact
-  Build:
-    needs: [SBOM, secret-detect]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout                            
-        uses: actions/checkout@v4.1.1
-      - name: Setup Java JDK
-        uses: actions/setup-java@v3.13.0
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-      - name: setting-app-env
-        run: |
-          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
-      - name: package
-        run: mvn clean package
-      - name: file check
-        run: |
-          ls -la target
-          echo $APP_NAME
-          echo $APP_NAME
-      # - name: unit-test
-      #   run: | 
-      #     mvn test
-      #     ls -la
-      #     ls -la target
-      #     cd target
-      #     cd site
-      #     ls -la jacoco
+#   #Building Maven Artifact
+#   Build:
+#     needs: [SBOM, secret-detect]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout                            
+#         uses: actions/checkout@v4.1.1
+#       - name: Setup Java JDK
+#         uses: actions/setup-java@v3.13.0
+#         with:
+#           distribution: 'temurin'
+#           java-version: '11'
+#       - name: setting-app-env
+#         run: |
+#           echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+#       - name: package
+#         run: mvn clean package
+#       - name: file check
+#         run: |
+#           ls -la target
+#           echo $APP_NAME
+#           echo $APP_NAME
+#       # - name: unit-test
+#       #   run: | 
+#       #     mvn test
+#       #     ls -la
+#       #     ls -la target
+#       #     cd target
+#       #     cd site
+#       #     ls -la jacoco
 
           
-  #     #Publishing the test results to the Job Summary
-  #     # - name: Publish Test Results
-  #     #   uses: EnricoMi/publish-unit-test-result-action@v2.11.0
-  #     #   with:
-  #     #     comment_mode: off
-  #     #     files: | 
-  #     #       target/surefire-reports/TEST-*.xml
+#   #     #Publishing the test results to the Job Summary
+#   #     # - name: Publish Test Results
+#   #     #   uses: EnricoMi/publish-unit-test-result-action@v2.11.0
+#   #     #   with:
+#   #     #     comment_mode: off
+#   #     #     files: | 
+#   #     #       target/surefire-reports/TEST-*.xml
 
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v3.1.3
-        with:
-          name: build
-          path: |
-            target/*.jar
-            target/site/jacoco/jacoco.xml
+#       - name: Upload a Build Artifact
+#         uses: actions/upload-artifact@v3.1.3
+#         with:
+#           name: build
+#           path: |
+#             target/*.jar
+#             target/site/jacoco/jacoco.xml
 
-     # Analysing the Source Code using SonarCloud
-  # Code-Analysis:
-  #   runs-on: ubuntu-latest
-  #   needs: [Build, secret-detect]
-  #   steps:
-  #     - name: Checkout                            
-  #       uses: actions/checkout@v4.1.1
+#      # Analysing the Source Code using SonarCloud
+#   # Code-Analysis:
+#   #   runs-on: ubuntu-latest
+#   #   needs: [Build, secret-detect]
+#   #   steps:
+#   #     - name: Checkout                            
+#   #       uses: actions/checkout@v4.1.1
 
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v2.1.1
-  #       with:
-  #         name: build
-  #         path: .
-  #     - name: Setting Git branch name
-  #       uses: petehouston/github-actions-query-branch-name@v1.2
-  #     - name: Analyze with SonarCloud
-  #       env:
-  #         BRANCH_NAME: ${{ steps.branch_extract.outputs.branch }}
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #       run: |
-  #         echo $GIT_BRANCH_NAME
-  #         #chmod +x ./mvnw
-  #         ls -la
-  #         mvn -B verify sonar:sonar -Dsonar.projectKey=super-info -Dsonar.organization=super-info -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/site/jacoco/jacoco.xml -Dsonar.qualitygate.wait=true
-  #       continue-on-error: true
+#   #     - name: Download artifacts
+#   #       uses: actions/download-artifact@v2.1.1
+#   #       with:
+#   #         name: build
+#   #         path: .
+#   #     - name: Setting Git branch name
+#   #       uses: petehouston/github-actions-query-branch-name@v1.2
+#   #     - name: Analyze with SonarCloud
+#   #       env:
+#   #         BRANCH_NAME: ${{ steps.branch_extract.outputs.branch }}
+#   #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#   #       run: |
+#   #         echo $GIT_BRANCH_NAME
+#   #         #chmod +x ./mvnw
+#   #         ls -la
+#   #         mvn -B verify sonar:sonar -Dsonar.projectKey=super-info -Dsonar.organization=super-info -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/site/jacoco/jacoco.xml -Dsonar.qualitygate.wait=true
+#   #       continue-on-error: true
 
         
-  Trivy-Scan:
-    runs-on: ubuntu-latest
-    needs: [Build, secret-detect]
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4.1.1
-      - name: setting-app-env
-        run: |
-          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
-          ls -la
+#   Trivy-Scan:
+#     runs-on: ubuntu-latest
+#     needs: [Build, secret-detect]
+#     steps:
+#       - name: checkout
+#         uses: actions/checkout@v4.1.1
+#       - name: setting-app-env
+#         run: |
+#           echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+#           ls -la
           
-      - name: Download build artifact
-        uses: actions/download-artifact@v2.1.1
-        with:
-          name: build
-          path: .
+#       - name: Download build artifact
+#         uses: actions/download-artifact@v2.1.1
+#         with:
+#           name: build
+#           path: .
 
-      - name: docker build
-        run: |
-          ls -la
-          docker build -t $APP_NAME:1.0.${{ github.run_number }} .
-          docker images
-          ls -la
-          # docker save -o ./$APP_NAME.tar $APP_NAME:1.0.${{ github.run_number }}
-          ls -la
-      # - name: Caching docker build files
-      #   uses: actions/cache@v3.3.2
-      #   with:
-      #     path: ./$APP_NAME.tar
-      #     key: ${{ runner.os }}-${{ github.sha }}
-      - name: Trivy scanning
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy image --format sarif -o report.sarif docker.io/$APP_NAME:1.0.${{ github.run_number }}
-          ls -la
-        shell: bash
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          # Path to SARIF file relative to the root of the repository
-          sarif_file: report.sarif
-          # Optional category for the results
-          # Used to differentiate multiple results for one commit
-          category: Trivy-analysis
-      # - name: Upload Build image to Artifact
-      #   uses: actions/upload-artifact@v3.1.3
-      #   with:
-      #     name: docker-img
-      #     path: ${{github.workspace}}/*.tar
+#       - name: docker build
+#         run: |
+#           ls -la
+#           docker build -t $APP_NAME:1.0.${{ github.run_number }} .
+#           docker images
+#           ls -la
+#           # docker save -o ./$APP_NAME.tar $APP_NAME:1.0.${{ github.run_number }}
+#           ls -la
+#       # - name: Caching docker build files
+#       #   uses: actions/cache@v3.3.2
+#       #   with:
+#       #     path: ./$APP_NAME.tar
+#       #     key: ${{ runner.os }}-${{ github.sha }}
+#       - name: Trivy scanning
+#         run: |
+#           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
+#           trivy image --format sarif -o report.sarif docker.io/$APP_NAME:1.0.${{ github.run_number }}
+#           ls -la
+#         shell: bash
+#       - name: Upload SARIF file
+#         uses: github/codeql-action/upload-sarif@v2
+#         with:
+#           # Path to SARIF file relative to the root of the repository
+#           sarif_file: report.sarif
+#           # Optional category for the results
+#           # Used to differentiate multiple results for one commit
+#           category: Trivy-analysis
+#       # - name: Upload Build image to Artifact
+#       #   uses: actions/upload-artifact@v3.1.3
+#       #   with:
+#       #     name: docker-img
+#       #     path: ${{github.workspace}}/*.tar
              
-  # pushing docker images to GCR
-  Docker-build:
-    needs: Trivy-Scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4.1.1
-      - name: setting-app-env
-        run: |
-          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
-          echo $APP_NAME
-      # - name: Downloading the docker build image
-      #   uses: actions/download-artifact@v2.1.1
-      #   with:
-      #     name: docker-img
-      #     path: ./
-      - name: Download build artifact
-        uses: actions/download-artifact@v2.1.1
-        with:
-          name: build
-          path: .
+#   # pushing docker images to GCR
+#   Docker-build:
+#     needs: Trivy-Scan
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: checkout
+#         uses: actions/checkout@v4.1.1
+#       - name: setting-app-env
+#         run: |
+#           echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+#           echo $APP_NAME
+#       # - name: Downloading the docker build image
+#       #   uses: actions/download-artifact@v2.1.1
+#       #   with:
+#       #     name: docker-img
+#       #     path: ./
+#       - name: Download build artifact
+#         uses: actions/download-artifact@v2.1.1
+#         with:
+#           name: build
+#           path: .
 
-      # - name: Caching docker build files
-      #   uses: actions/cache@v3.3.2
-      #   with:
-      #     path: ./$APP_NAME.tar
-      #     key: ${{ runner.os }}-${{ github.sha }}
-      #     fail-on-cache-miss: true
-      # - name: extracting docker artifact
-      #   run: |
-      #     docker load -i ./$APP_NAME.tar
-      #     docker images
-      - name: building docker images
-        run: |
-          ls -la
-          docker build -t $APP_NAME:1.0.${{ github.run_number }} . 
-          docker images
-      - name: Push Docker GCR
-        uses: RaccoonDev/push-docker-gcr@v1
-        env:
-          GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
-          GOOGLE_PROJECT_ID: ${{ vars.GOOGLE_PROJECT_ID }}
-        with:
-          image_name: ${{ env.APP_NAME }}
-          image_tag: 1.0.${{ github.run_number }}
+#       # - name: Caching docker build files
+#       #   uses: actions/cache@v3.3.2
+#       #   with:
+#       #     path: ./$APP_NAME.tar
+#       #     key: ${{ runner.os }}-${{ github.sha }}
+#       #     fail-on-cache-miss: true
+#       # - name: extracting docker artifact
+#       #   run: |
+#       #     docker load -i ./$APP_NAME.tar
+#       #     docker images
+#       - name: building docker images
+#         run: |
+#           ls -la
+#           docker build -t $APP_NAME:1.0.${{ github.run_number }} . 
+#           docker images
+#       - name: Push Docker GCR
+#         uses: RaccoonDev/push-docker-gcr@v1
+#         env:
+#           GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
+#           GOOGLE_PROJECT_ID: ${{ vars.GOOGLE_PROJECT_ID }}
+#         with:
+#           image_name: ${{ env.APP_NAME }}
+#           image_tag: 1.0.${{ github.run_number }}
           
-    # Update Manifest File
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-        with:
-          repository: 'super-info/k8s-manifest'
-          token: ${{ secrets.GIT_TOKEN }}
-      - name: Update image
-        run: |
-          echo $APP_NAME
-          ls -la
-          git config --global user.email "${{ secrets.GIT_MAIL }}"
-          git config --global user.name "$GITHUB_REPOSITORY_OWNER"
-          cd $APP_NAME
-          sed -i "s|gcr.io/${{ vars.GOOGLE_PROJECT_ID }}.*| gcr.io/${{ vars.GOOGLE_PROJECT_ID }}/$APP_NAME:1.0.${{ github.run_number }}|g" deployment.yaml
-          cat deployment.yaml
-          git add .
-          git commit -m "image update"
-          git push -uf origin
+#     # Update Manifest File
+#       - name: Checkout
+#         uses: actions/checkout@v4.1.1
+#         with:
+#           repository: 'super-info/k8s-manifest'
+#           token: ${{ secrets.GIT_TOKEN }}
+#       - name: Update image
+#         run: |
+#           echo $APP_NAME
+#           ls -la
+#           git config --global user.email "${{ secrets.GIT_MAIL }}"
+#           git config --global user.name "$GITHUB_REPOSITORY_OWNER"
+#           cd $APP_NAME
+#           sed -i "s|gcr.io/${{ vars.GOOGLE_PROJECT_ID }}.*| gcr.io/${{ vars.GOOGLE_PROJECT_ID }}/$APP_NAME:1.0.${{ github.run_number }}|g" deployment.yaml
+#           cat deployment.yaml
+#           git add .
+#           git commit -m "image update"
+#           git push -uf origin
           
 
           
-    # #  - name: JaCoCo Report
-    # #    uses: Madrapps/jacoco-report@v1.6.1
-    # #    with:
-    # #      paths: target/site/jacoco/jacoco.xml
-    # #      token: ${{secrets.TOKEN_REPO}}
-    # #      min-coverage-overall: 60
+#     # #  - name: JaCoCo Report
+#     # #    uses: Madrapps/jacoco-report@v1.6.1
+#     # #    with:
+#     # #      paths: target/site/jacoco/jacoco.xml
+#     # #      token: ${{secrets.TOKEN_REPO}}
+#     # #      min-coverage-overall: 60
 
   
       
