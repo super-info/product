@@ -1,6 +1,6 @@
 #Springboot-jdk-11
 name: product
-on: workflow_dispatch
+on: [workflow_dispatch, push]
 env:
   DB_USER: ${{ secrets.DB_USER }}
   DB_PASS: ${{ secrets.DB_PASS }}
@@ -179,7 +179,7 @@ jobs:
         uses: actions/cache@v3.3.2
         with:
           path: ./$APP_NAME.tar
-          key: ${{ runner.os }}-${{ hashFiles('${{ github_workspace }}/*.tar')}}
+          key: ${{ runner.os }}-${{ github.sha }}
       - name: Trivy scanning
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
