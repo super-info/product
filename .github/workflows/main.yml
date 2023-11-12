@@ -55,7 +55,7 @@ jobs:
      steps:
        - name: testing
          env:
-           APP_NAME: ${{ secret.outputs.appfile }}
+           APP_NAME: ${{ needs.secret.outputs.appfile }}
          run: |
            echo "this is $APP_NAME"
    #     - name: checking
