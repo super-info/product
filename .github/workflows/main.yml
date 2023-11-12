@@ -122,7 +122,7 @@ jobs:
         with:
           name: build
           path: |
-            target/$APP_NAME*.jar
+            target/*.jar
 
   #    # Analysing the Source Code using SonarCloud
   # Code-Analysis:
