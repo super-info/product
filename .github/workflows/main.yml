@@ -174,12 +174,13 @@ jobs:
           ls -la
           docker build -t $APP_NAME:1.0.${{ github.run_number }} .
           docker images
-          docker save -o ${{ github.workspace }}/$APP_NAME.tar $APP_NAME:1.0.${{ github.run_number }}
+          ls -la
+          docker save -o ${{ github.workspace }}/tmp/$APP_NAME.tar $APP_NAME:1.0.${{ github.run_number }}
           ls -la
       - name: Caching docker build files
         uses: actions/cache@v3.3.2
         with:
-          path: ./$APP_NAME.tar
+          path: /tmp/$APP_NAME.tar
           key: ${{ runner.os }}-${{ github.sha }}
       - name: Trivy scanning
         run: |
@@ -220,7 +221,7 @@ jobs:
   #       uses: actions/cache@v3.3.2
   #       with:
   #         path: ./$APP_NAME.tar
-  #         key: ${{ runner.os }}-${{ hashFiles('${{ github.workspace }}*.tar')}}
+  #         key: ${{ runner.os }}-${{ github.sha }}
   #         fail-on-cache-miss: true
   #     - name: extracting docker artifact
   #       run: |
