@@ -92,7 +92,9 @@ jobs:
         env:
           APP_NAME: ${{needs.secret-detect.outputs.appfile }}
       - name: file check
-        run: ls -la target
+        run: |
+          ls -la target
+          echo $APP_NAME
       # - name: unit-test
       #   run: | 
       #     mvn test
@@ -115,9 +117,9 @@ jobs:
         uses: actions/upload-artifact@v3.1.3
         with:
           name: build
-          path:
-            /target/$APP_NAME*.jar
-            /target/site/jacoco/jacoco.xml
+          path: |
+            target/$APP_NAME*.jar
+            target/site/jacoco/jacoco.xml
 
   #    # Analysing the Source Code using SonarCloud
   # Code-Analysis:
