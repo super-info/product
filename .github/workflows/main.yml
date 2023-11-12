@@ -148,7 +148,7 @@ jobs:
           echo $GIT_BRANCH_NAME
           #chmod +x ./mvnw
           ls -la
-          mvn -B verify sonar:sonar -Dsonar.projectKey=super-info -Dsonar.organization=super-info -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/build/site/jacoco/jacoco.xml -Dsonar.qualitygate.wait=true
+          mvn -B verify sonar:sonar -Dsonar.projectKey=super-info -Dsonar.organization=super-info -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/site/jacoco/jacoco.xml -Dsonar.qualitygate.wait=true
         continue-on-error: true
 
         
