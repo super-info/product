@@ -180,7 +180,6 @@ jobs:
         with:
           path: ./$APP_NAME.tar
           key: ${{github.repository}}-${{ hashFiles('./*.tar')}}
-          fail-on-cache-miss: true
       - name: Trivy scanning
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
