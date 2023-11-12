@@ -51,7 +51,7 @@ jobs:
      steps:
        - name: testing
          env:
-           APP_NAME: ${{ needs.sbom.outputs.appfile }}
+           APP_NAME: ${{ jobs.secret.outputs.appfile }}
          run: |
            echo "this is $APP_NAME"
    #     - name: checking
