@@ -72,35 +72,35 @@ jobs:
       - name: Upload Sbom 
         uses: actions/upload-artifact@v3.1.3
         with:
-          name: SBOM-Report-$APP_NAME
+          name: SBOM-Report
           path: ${{ github.workspace }}/_manifest
           
-  # #Building Maven Artifact
-  # Build:
-  #   needs: [SBOM, secret-detect]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout                            
-  #       uses: actions/checkout@v4.1.1
-  #     - name: Setup Java JDK
-  #       uses: actions/setup-java@v3.13.0
-  #       with:
-  #         distribution: 'temurin'
-  #         java-version: '11'
-  #     - name: package
-  #       run: mvn clean package
-  #       env:
-  #         APP_NAME: ${{needs.secret-detect.outputs.appfile }}
-  #     - name: file check
-  #       run: ls -la target
-  #     # - name: unit-test
-  #     #   run: | 
-  #     #     mvn test
-  #     #     ls -la
-  #     #     ls -la target
-  #     #     cd target
-  #     #     cd site
-  #     #     ls -la jacoco
+  #Building Maven Artifact
+  Build:
+    needs: [SBOM, secret-detect]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout                            
+        uses: actions/checkout@v4.1.1
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.13.0
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: package
+        run: mvn clean package
+        env:
+          APP_NAME: ${{needs.secret-detect.outputs.appfile }}
+      - name: file check
+        run: ls -la target
+      # - name: unit-test
+      #   run: | 
+      #     mvn test
+      #     ls -la
+      #     ls -la target
+      #     cd target
+      #     cd site
+      #     ls -la jacoco
 
           
   #     #Publishing the test results to the Job Summary
@@ -111,13 +111,13 @@ jobs:
   #     #     files: | 
   #     #       target/surefire-reports/TEST-*.xml
 
-  #     - name: Upload a Build Artifact
-  #       uses: actions/upload-artifact@v3.1.3
-  #       with:
-  #         name: build-$APP_NAME
-  #         path:
-  #           /target/$APP_NAME*.jar
-  #           /target/site/jacoco/jacoco.xml
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: build
+          path:
+            /target/$APP_NAME*.jar
+            /target/site/jacoco/jacoco.xml
 
   #    # Analysing the Source Code using SonarCloud
   # Code-Analysis:
@@ -131,7 +131,7 @@ jobs:
   #     - name: Download artifacts
   #       uses: actions/download-artifact@v2.1.1
   #       with:
-  #         name: build-$APP_NAME
+  #         name: build
   #         path: .
   #     - name: Setting Git branch name
   #       uses: petehouston/github-actions-query-branch-name@v1.2
@@ -158,7 +158,7 @@ jobs:
   #     - name: Download build artifact
   #       uses: actions/download-artifact@v2.1.1
   #       with:
-  #         name: build-$APP_NAME
+  #         name: build
 
   #     - name: docker build
   #       run: |
