@@ -90,10 +90,10 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       - name: setting-app-env
-        env:
-          APP_NAME: $(basename ${{ github.repository }})
         run: |
+          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
           echo $APP_NAME
+          echo ${{env.APP_NAME}}
       - name: package
         run: mvn clean package
       - name: file check
@@ -120,13 +120,13 @@ jobs:
   #     #     files: | 
   #     #       target/surefire-reports/TEST-*.xml
 
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v3.1.3
-        with:
-          name: build
-          path: |
-            target/$APP_NAME*.jar
-            target/site/jacoco/jacoco.xml
+      # - name: Upload a Build Artifact
+      #   uses: actions/upload-artifact@v3.1.3
+      #   with:
+      #     name: build
+      #     path: |
+      #       target/$APP_NAME*.jar
+      #       target/site/jacoco/jacoco.xml
 
   #    # Analysing the Source Code using SonarCloud
   # Code-Analysis:
