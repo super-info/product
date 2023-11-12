@@ -257,12 +257,14 @@ jobs:
           
 
           
-  #   # #  - name: JaCoCo Report
-  #   # #    uses: Madrapps/jacoco-report@v1.6.1
-  #   # #    with:
-  #   # #      paths: target/site/jacoco/jacoco.xml
-  #   # #      token: ${{secrets.TOKEN_REPO}}
-  #   # #      min-coverage-overall: 60
+    # #  - name: JaCoCo Report
+    # #    uses: Madrapps/jacoco-report@v1.6.1
+    # #    with:
+    # #      paths: target/site/jacoco/jacoco.xml
+    # #      token: ${{secrets.TOKEN_REPO}}
+    # #      min-coverage-overall: 60
+
+  
       
 
     
