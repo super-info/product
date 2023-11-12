@@ -161,6 +161,7 @@ jobs:
       - name: setting-app-env
         run: |
           echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+          ls -la
           
       - name: Download build artifact
         uses: actions/download-artifact@v2.1.1
