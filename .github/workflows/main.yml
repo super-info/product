@@ -126,30 +126,30 @@ jobs:
             target/site/jacoco/jacoco.xml
 
      # Analysing the Source Code using SonarCloud
-  Code-Analysis:
-    runs-on: ubuntu-latest
-    needs: [Build, secret-detect]
-    steps:
-      - name: Checkout                            
-        uses: actions/checkout@v4.1.1
+  # Code-Analysis:
+  #   runs-on: ubuntu-latest
+  #   needs: [Build, secret-detect]
+  #   steps:
+  #     - name: Checkout                            
+  #       uses: actions/checkout@v4.1.1
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v2.1.1
-        with:
-          name: build
-          path: .
-      - name: Setting Git branch name
-        uses: petehouston/github-actions-query-branch-name@v1.2
-      - name: Analyze with SonarCloud
-        env:
-          BRANCH_NAME: ${{ steps.branch_extract.outputs.branch }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          echo $GIT_BRANCH_NAME
-          #chmod +x ./mvnw
-          ls -la
-          mvn -B verify sonar:sonar -Dsonar.projectKey=super-info -Dsonar.organization=super-info -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/site/jacoco/jacoco.xml -Dsonar.qualitygate.wait=true
-        continue-on-error: true
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v2.1.1
+  #       with:
+  #         name: build
+  #         path: .
+  #     - name: Setting Git branch name
+  #       uses: petehouston/github-actions-query-branch-name@v1.2
+  #     - name: Analyze with SonarCloud
+  #       env:
+  #         BRANCH_NAME: ${{ steps.branch_extract.outputs.branch }}
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #       run: |
+  #         echo $GIT_BRANCH_NAME
+  #         #chmod +x ./mvnw
+  #         ls -la
+  #         mvn -B verify sonar:sonar -Dsonar.projectKey=super-info -Dsonar.organization=super-info -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=${{ github.workspace }}/site/jacoco/jacoco.xml -Dsonar.qualitygate.wait=true
+  #       continue-on-error: true
 
         
   Trivy-Scan:
@@ -179,7 +179,7 @@ jobs:
         uses: actions/cache@v3.3.2
         with:
           path: ./$APP_NAME.tar
-          key: ${{github.repository}}-${{ hashFiles('./*.tar')}}
+          key: ${{ runner.os }}-${{ hashFiles('${{ github_workspace }}/*.tar')}}
       - name: Trivy scanning
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
@@ -201,59 +201,59 @@ jobs:
       #     path: ${{github.workspace}}/*.tar
              
   # pushing docker images to GCR
-  Deploy:
-    needs: Trivy-Scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: setting-app-env
-        run: |
-          echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
-          echo $APP_NAME
-      # - name: Downloading the docker build image
-      #   uses: actions/download-artifact@v2.1.1
-      #   with:
-      #     name: docker-img
-      #     path: ./
+  # Deploy:
+  #   needs: Trivy-Scan
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: setting-app-env
+  #       run: |
+  #         echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+  #         echo $APP_NAME
+  #     # - name: Downloading the docker build image
+  #     #   uses: actions/download-artifact@v2.1.1
+  #     #   with:
+  #     #     name: docker-img
+  #     #     path: ./
 
-      - name: Caching docker build files
-        uses: actions/cache@v3.3.2
-        with:
-          path: ./$APP_NAME.tar
-          key: ${{github.repository}}-${{ hashFiles('./*.tar')}}
-          fail-on-cache-miss: true
-      - name: extracting docker artifact
-        run: |
-          docker load -i ./$APP_NAME.tar
-          docker images
+  #     - name: Caching docker build files
+  #       uses: actions/cache@v3.3.2
+  #       with:
+  #         path: ./$APP_NAME.tar
+  #         key: ${{ runner.os }}-${{ hashFiles('${{ github.workspace }}*.tar')}}
+  #         fail-on-cache-miss: true
+  #     - name: extracting docker artifact
+  #       run: |
+  #         docker load -i ./$APP_NAME.tar
+  #         docker images
         
-      - name: Push Docker GCR
-        uses: RaccoonDev/push-docker-gcr@v1
-        env:
-          GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
-          GOOGLE_PROJECT_ID: ${{ inputs.google_project_id }}
-        with:
-          image_name: $APP_NAME
-          image_tag: 1.0.${{ github.run_number }}
+  #     - name: Push Docker GCR
+  #       uses: RaccoonDev/push-docker-gcr@v1
+  #       env:
+  #         GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
+  #         GOOGLE_PROJECT_ID: ${{ inputs.google_project_id }}
+  #       with:
+  #         image_name: $APP_NAME
+  #         image_tag: 1.0.${{ github.run_number }}
           
-    # Update Manifest File
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-        with:
-          repository: 'super-info/k8s-manifest'
-          token: ${{ secrets.GIT_TOKEN }}
-      - name: Update image
-        env:
-          manifest_app: $(basename ${{ github.repository }})
-        run: |
-          ls -la
-          git config --global user.email "${{ secrets.GIT_MAIL }}"
-          git config --global user.name "$GITHUB_REPOSITORY_OWNER"
-          cd $manifest_app
-          sed -i "s|gcr.io/${{ inputs.google_project_id }}.*| gcr.io/${{ inputs.google_project_id }}/$manifest_app:1.0.${{ github.run_number }}|g" deployment.yaml
-          cat deployment.yaml
-          git add .
-          git commit -m "image update"
-          git push -uf origin
+  #   # Update Manifest File
+  #     - name: Checkout
+  #       uses: actions/checkout@v4.1.1
+  #       with:
+  #         repository: 'super-info/k8s-manifest'
+  #         token: ${{ secrets.GIT_TOKEN }}
+  #     - name: Update image
+  #       env:
+  #         manifest_app: $(basename ${{ github.repository }})
+  #       run: |
+  #         ls -la
+  #         git config --global user.email "${{ secrets.GIT_MAIL }}"
+  #         git config --global user.name "$GITHUB_REPOSITORY_OWNER"
+  #         cd $manifest_app
+  #         sed -i "s|gcr.io/${{ inputs.google_project_id }}.*| gcr.io/${{ inputs.google_project_id }}/$manifest_app:1.0.${{ github.run_number }}|g" deployment.yaml
+  #         cat deployment.yaml
+  #         git add .
+  #         git commit -m "image update"
+  #         git push -uf origin
           
 
           
