@@ -68,7 +68,7 @@ jobs:
           ls -la
           echo $APP_NAME
           echo $(APP_NAME)
-          echo ${{APP_NAME}}
+          #echo ${{APP_NAME}}
           echo $app-name
           echo "this is $APP_NAME"
           echo "this is $app-name"
