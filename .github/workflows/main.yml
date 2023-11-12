@@ -7,6 +7,8 @@ env:
   DB_HOST: ${{ secrets.DB_HOST }}
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PORT: ${{ secrets.DB_PORT }}
+  APP_NAME: $(basename ${{ github.repository }})
+  
 permissions:
    checks: write
    security-events: write
@@ -30,15 +32,15 @@ jobs:
   #Scanning for secret detection
   secret-detect:
     runs-on: ubuntu-latest
-    outputs:
-      appfile: ${{ steps.appenv.outputs.app-name}}
+    # outputs:
+    #   appfile: ${{ steps.appenv.outputs.app-name}}
     steps:
     # Checking out the code
       - name: Checkout                            
         uses: actions/checkout@v4.1.1
-      - name: setting-app-env
-        id: appenv
-        run: echo "app-name= $(basename ${{github.repository}})" >> $GITHUB_OUTPUT
+      # - name: setting-app-env
+      #   id: appenv
+      #   run: echo "app-name= $(basename ${{github.repository}})" >> $GITHUB_OUTPUT
           
       - name: GitGuardian Shield Action
         env:
@@ -56,13 +58,14 @@ jobs:
     steps:
       - name: Checkout                            
         uses: actions/checkout@v4.1.1
-      - name: setting-app-env
-        env: 
-          APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
-        run: |
-          echo $APP_NAME
+      # - name: setting-app-env
+      #   env: 
+      #     APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
+      #   run: |
+      #     echo $APP_NAME
       - name: Generate SBOM
         run: |
+          echo $APP_NAME
           curl -Lo sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
           ls -la
           chmod +x sbom-tool
@@ -87,11 +90,11 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: setting-app-env
-        env:
-          APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
-        run: |
-          echo $APP_NAME
+      # - name: setting-app-env
+      #   env:
+      #     APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
+      #   run: |
+      #     echo $APP_NAME
       - name: package
         run: mvn clean package
       - name: file check
@@ -124,7 +127,7 @@ jobs:
           name: build
           path: |
             target/$APP_NAME*.jar
-            target/site/jacoco/jacoco.xml
+            #target/site/jacoco/jacoco.xml
 
   #    # Analysing the Source Code using SonarCloud
   # Code-Analysis:
