@@ -122,7 +122,7 @@ jobs:
         with:
           name: build
           path: |
-            target/*.{jar,war}
+            target/*.{jar,war} >> 2>/dev/null
 
   #    # Analysing the Source Code using SonarCloud
   # Code-Analysis:
