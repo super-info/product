@@ -38,7 +38,7 @@ jobs:
         uses: actions/checkout@v4.1.1
       - name: setting-app-env
         id: appenv
-        run: echo "app-name= $(basename ${{github.repository}})" >> $GITHUB_OUtPUT
+        run: echo "app-name= $(basename ${{github.repository}})" >> $GITHUB_OUTPUT
       - name: echo
         id: app
         run: |
@@ -197,6 +197,7 @@ jobs:
              
   # pushing docker images to GCR
   Deploy:
+    needs: Trivy-Scan
     runs-on: ubuntu-latest
     steps:
       - name: setting-app-env
