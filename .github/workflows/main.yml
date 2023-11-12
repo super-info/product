@@ -90,10 +90,11 @@ jobs:
       - name: package
         run: mvn clean package
         env:
-          APP_NAME: ${{needs.secret-detect.outputs.appfile }}
+          APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
       - name: file check
         run: |
           ls -la target
+          echo $APP_NAME
           echo $APP_NAME
       # - name: unit-test
       #   run: | 
