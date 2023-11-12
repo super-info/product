@@ -1,6 +1,6 @@
 #Springboot-jdk-11
 name: product
-on: [workflow_dispatch, push]
+on: [push, workflow_dispatch]
 env:
   DB_USER: ${{ secrets.DB_USER }}
   DB_PASS: ${{ secrets.DB_PASS }}
