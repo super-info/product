@@ -87,11 +87,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: package
-        run: mvn clean package
+      - name: setting-app-env
         env:
           APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
           test_app: $(basename ${{ github.repository }})
+      # - name: package
+      #   run: mvn clean package
       - name: file check
         run: |
           ls -la target
