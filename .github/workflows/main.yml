@@ -59,11 +59,8 @@ jobs:
       - name: setting-app-env
         env: 
           APP_NAME: ${{ needs.secret-detect.outputs.appfile }}
-          app-name: ${{ needs.secret-detect.outputs.appfile }}
         run: |
-          echo $app-name
-          echo "this is $APP_NAME"
-          echo "this is $app-name"
+          echo $APP_NAME
       - name: Generate SBOM
         run: |
           curl -Lo sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
@@ -72,11 +69,11 @@ jobs:
           ./sbom-tool generate -b ${{ github.workspace }} -bc ${{ github.workspace }} -pn ${{github.repository}} -pv 1.0.0 -ps ${{github.repository_owner}} -nsb https://sbom.mycompany.com -V
           ls -la
 
-      # - name: Upload Sbom 
-      #   uses: actions/upload-artifact@v3.1.3
-      #   with:
-      #     name: SBOM-Report-$APP_NAME
-      #     path: ${{ github.workspace }}/_manifest
+      - name: Upload Sbom 
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: SBOM-Report-$APP_NAME
+          path: ${{ github.workspace }}/_manifest
           
   # #Building Maven Artifact
   # Build:
