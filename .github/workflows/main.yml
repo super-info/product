@@ -179,7 +179,7 @@ jobs:
         uses: actions/cache@v3.3.2
         with:
           path: ./$APP_NAME.tar
-          key: ${{github.repository}}-${{( hashFiles ('./*tar')}}
+          key: ${{github.repository}}-${{ hashFiles ('./*tar')}}
           fail-on-cache-miss: true
       - name: Trivy scanning
         run: |
@@ -221,7 +221,7 @@ jobs:
         uses: actions/cache@v3.3.2
         with:
           path: ./$APP_NAME.tar
-          key: ${{github.repository}}-${{( hashFiles ('./*tar')}}
+          key: ${{github.repository}}-${{ hashFiles ('./*tar')}}
           fail-on-cache-miss: true
       - name: extracting docker artifact
         run: docker load -i ./$APP_NAME.tar
