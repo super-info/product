@@ -66,9 +66,6 @@ jobs:
           chmod +x sbom-tool
           ./sbom-tool generate -b ${{ github.workspace }} -bc ${{ github.workspace }} -pn ${{github.repository}} -pv 1.0.0 -ps ${{github.repository_owner}} -nsb https://sbom.mycompany.com -V
           ls -la
-          echo $APP_NAME
-          echo $(APP_NAME)
-          #echo ${{APP_NAME}}
           echo $app-name
           echo "this is $APP_NAME"
           echo "this is $app-name"
