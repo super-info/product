@@ -46,14 +46,19 @@ jobs:
 
             
    test:
-     needs: sbom
+     needs: [sbom, secret]
      runs-on: ubuntu-latest
      steps:
        - name: testing
          env:
            APP_NAME: ${{ jobs.secret.outputs.appfile }}
+           appname: ${{ jobs.steps.app.appname }}
+           ap_name: ${{ needs.secret.outputs.appfile }}
          run: |
            echo "this is $APP_NAME"
+           echo $APP_NAME
+           echo $appname
+           echo $ap_name
    #     - name: checking
    #       run: 
           
