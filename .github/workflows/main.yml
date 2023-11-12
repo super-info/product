@@ -256,18 +256,18 @@ jobs:
           token: ${{ secrets.GIT_TOKEN }}
       - name: Update image
         run: |
-          echo "manifest_app=$(basename ${{github.repository}})" >> $GITHUB_ENV
+          echo "manifest_app=$(basename ${{ github.repository }})" >> $GITHUB_ENV
           echo $manifest_app
           echo $APP_NAME
           ls -la
-          git config --global user.email "${{ secrets.GIT_MAIL }}"
-          git config --global user.name "$GITHUB_REPOSITORY_OWNER"
-          cd k8s-manifest
-          sed -i "s|gcr.io/${{ vars.GOOGLE_PROJECT_ID }}.*| gcr.io/${{ vars.GOOGLE_PROJECT_ID }}/$APP_NAME:1.0.${{ github.run_number }}|g" deployment.yaml
-          cat deployment.yaml
-          git add .
-          git commit -m "image update"
-          git push -uf origin
+          # git config --global user.email "${{ secrets.GIT_MAIL }}"
+          # git config --global user.name "$GITHUB_REPOSITORY_OWNER"
+          # cd k8s-manifest
+          # sed -i "s|gcr.io/${{ vars.GOOGLE_PROJECT_ID }}.*| gcr.io/${{ vars.GOOGLE_PROJECT_ID }}/$APP_NAME:1.0.${{ github.run_number }}|g" deployment.yaml
+          # cat deployment.yaml
+          # git add .
+          # git commit -m "image update"
+          # git push -uf origin
           
 
           
