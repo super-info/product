@@ -3,7 +3,6 @@ name: product
 on: 
   workflow_dispatch:
   pull_request:
-    types: closed
     branches: main
 env:
   DB_USER: ${{ secrets.DB_USER }}
